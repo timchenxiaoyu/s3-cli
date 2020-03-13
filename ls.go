@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/urfave/cli"
 )
 
-func ListBucket(config *Config, c *cli.Context) error {
+func List(config *Config, c *cli.Context) error {
 	args := c.Args()
-	fmt.Println(args)
 	svc := GetS3Client(config)
 
 	if len(args) == 0 || args[0] == "s3://" {
@@ -23,44 +23,36 @@ func ListBucket(config *Config, c *cli.Context) error {
 		}
 		return nil
 	}
-
+	return listObject(svc, config, args)
 }
 
-func listBucket(config *Config, svc *s3.S3, args []string) error {
-	for _, arg := range args {
-		u, err := FileURINew(arg)
-		if err != nil || u.Scheme != "s3" {
-			return fmt.Errorf("ls requires buckets to be prefixed with s3://")
-		}
+func listObject(s3c *s3.S3, config *Config, args []string) error {
+	u, err := NewS3Path(args[0])
 
-		_, err = SessionForBucket(config, u.Bucket)
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	lo := &s3.ListObjectsInput{
+		Bucket:  aws.String(u.Bucket),
+		MaxKeys: aws.Int64(1000),
+		//Marker:    aws.String(marker),
+		Delimiter: aws.String("/"),
+		Prefix:    aws.String(u.Path),
+	}
 
-		todo := []string{arg}
+	lor, err := s3c.ListObjects(lo)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
-		for len(todo) != 0 {
-			var item string
-			item, todo = todo[0], todo[1:]
+	for _, d := range lor.CommonPrefixes {
+		fmt.Printf("%16s %9s   %s://%s/%s\n", "", "DIR", u.Scheme, u.Bucket, *d.Prefix)
+	}
 
-			remotePager(config, svc, item, !config.Recursive, func(page *s3.ListObjectsV2Output) {
-				for _, item := range page.CommonPrefixes {
-					uri := fmt.Sprintf("s3://%s/%s", u.Bucket, *item.Prefix)
-
-					if config.Recursive {
-						todo = append(todo, uri)
-					} else {
-						fmt.Printf("%16s %9s   %s\n", "", "DIR", uri)
-					}
-				}
-				if page.Contents != nil {
-					for _, item := range page.Contents {
-						fmt.Printf("%16s %9d   s3://%s/%s\n", item.LastModified.Format(DATE_FMT), *item.Size, u.Bucket, *item.Key)
-					}
-				}
-			})
-		}
+	for _, f := range lor.Contents {
+		fmt.Printf("%16s %9d   s3://%s/%s\n", f.LastModified.Format(DATE_FMT), *f.Size, u.Bucket, *f.Key)
 	}
 
 	return nil
