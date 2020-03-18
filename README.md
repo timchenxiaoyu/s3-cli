@@ -24,4 +24,5 @@ region= default
 #s3-cli get s3://BUCKET/OBJECT LOCAL_FILE
 #s3-cli rm s3://BUCKET/OBJECT
 #s3-cli sync LOCAL_DIR s3://BUCKET[/PREFIX] or s3://BUCKET[/PREFIX] LOCAL_DIR
+#s3-cli du s3://BUCKET[/PREFIX]
 ```

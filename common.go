@@ -13,6 +13,14 @@ const DATE_FMT = "2006-01-02 15:04"
 type FileType string
 
 const (
+	BYTE = 1 << (10 * iota)
+	KB
+	MB
+	GB
+	TB
+)
+
+const (
 	DIR  FileType = "DIR"
 	FILE FileType = "FILE"
 )
@@ -94,4 +102,18 @@ func AmazonEtagHash(path string) (string, error) {
 		hash += fmt.Sprintf("-%d", count)
 	}
 	return hash, nil
+}
+
+func HumanReadByteSize(size float64) string {
+	if size > TB {
+		return fmt.Sprintf("%fT", size/TB)
+	} else if size > GB {
+		return fmt.Sprintf("%fG", size/GB)
+	} else if size > MB {
+		return fmt.Sprintf("%fM", size/MB)
+	} else if size > KB {
+		return fmt.Sprintf("%fKB", size/KB)
+	}
+
+	return fmt.Sprintf("%fB", size)
 }

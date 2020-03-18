@@ -66,6 +66,12 @@ func main() {
 			Action: wrapper(Del),
 			Flags:  app.Flags,
 		},
+		{
+			Name:   "du",
+			Usage:  "Disk usage by buckets -- s3-cli  du s3://BUCKET[/PREFIX]",
+			Action: wrapper(Du),
+			Flags:  app.Flags,
+		},
 	}
 
 	app.Run(os.Args)

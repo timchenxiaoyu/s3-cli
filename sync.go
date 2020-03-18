@@ -145,7 +145,7 @@ func getAllS3(s3c *s3.S3, s3path *S3Path, prefixflen int, s3files map[string]Fil
 	for {
 		lo := &s3.ListObjectsInput{
 			Bucket:    aws.String(s3path.Bucket),
-			MaxKeys:   aws.Int64(2),
+			MaxKeys:   aws.Int64(1000),
 			Marker:    mark,
 			Delimiter: aws.String("/"),
 			Prefix:    aws.String(s3path.Path),
