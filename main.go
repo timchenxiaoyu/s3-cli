@@ -56,7 +56,7 @@ func main() {
 		},
 		{
 			Name:   "sync",
-			Usage:  " Synchronize a directory tree with S3 -- s3-cli  sync LOCAL_DIR s3://BUCKET[/PREFIX] or or s3://BUCKET[/PREFIX] LOCAL_DIR",
+			Usage:  " Synchronize a directory tree with S3 -- s3-cli  sync LOCAL_DIR s3://BUCKET[/PREFIX] or s3://BUCKET[/PREFIX] LOCAL_DIR",
 			Action: wrapper(Sync),
 			Flags:  app.Flags,
 		},
