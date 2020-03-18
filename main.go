@@ -72,6 +72,12 @@ func main() {
 			Action: wrapper(Du),
 			Flags:  app.Flags,
 		},
+		{
+			Name:   "info",
+			Usage:  "Get various information about Buckets or Files -- s3-cli  info s3://BUCKET[/OBJECT]",
+			Action: wrapper(Info),
+			Flags:  app.Flags,
+		},
 	}
 
 	app.Run(os.Args)
